@@ -1,0 +1,277 @@
+:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #1c2740;
+  background: #f3f6fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f8faff 0%, #edf2fb 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #d6deee;
+  backdrop-filter: blur(8px);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.menu-toggle {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #c6d1e7;
+  border-radius: 10px;
+  background: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: #1f335a;
+}
+
+.navbar-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.navbar-badge {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #a6e1bf;
+  background: #ddf9e8;
+  color: #145d37;
+  font-size: 0.82rem;
+}
+
+.app-content-shell {
+  min-height: calc(100vh - 64px);
+  display: grid;
+  grid-template-columns: 250px 1fr;
+}
+
+.sidebar {
+  border-right: 1px solid #d6deee;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: #3f5174;
+  font-weight: 500;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+}
+
+.sidebar-link:hover {
+  background: #edf3ff;
+}
+
+.sidebar-link-active {
+  color: #173465;
+  background: #dee9fd;
+}
+
+.app-main {
+  padding: 1rem;
+}
+
+.page {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.page-header p {
+  margin: 0.35rem 0 0;
+  color: #5f6f8b;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.metric-card,
+.panel {
+  background: #fff;
+  border: 1px solid #d6deee;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.metric-card p {
+  margin: 0;
+  color: #61718d;
+}
+
+.metric-card h3 {
+  margin: 0.45rem 0 0;
+  font-size: 1.4rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.panel h3 {
+  margin: 0 0 0.45rem;
+}
+
+.panel p,
+.panel ul {
+  margin: 0;
+  color: #4f5f79;
+}
+
+.panel ul {
+  padding-left: 1rem;
+}
+
+.panel-stack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.report-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.report-item button {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #b8caf0;
+  border-radius: 10px;
+  color: #16386f;
+  background: #e7efff;
+  cursor: pointer;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.timeline li {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  background: #f5f8ff;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.timeline em {
+  font-style: normal;
+  color: #71829f;
+  font-size: 0.88rem;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline li {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-content-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    bottom: 0;
+    width: min(80vw, 280px);
+    transform: translateX(-100%);
+    transition: transform 0.24s ease;
+    box-shadow: 4px 0 24px rgba(15, 24, 38, 0.16);
+    z-index: 70;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 64px 0 0 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.22);
+    z-index: 60;
+  }
+
+  .navbar-badge {
+    display: none;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
