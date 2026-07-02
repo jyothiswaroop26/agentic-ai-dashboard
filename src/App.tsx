@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Reports from "./pages/Reports";
+import ResearchRequest from "./pages/ResearchRequest";
 import "./styles/layout.css";
 
 const App = () => {
@@ -41,6 +42,7 @@ const App = () => {
 							<Route path="/dashboard" element={<Dashboard />} />
 							<Route path="/history" element={<History />} />
 							<Route path="/reports" element={<Reports />} />
+							<Route path="/research" element={<ResearchRequest />} />
 						</Routes>
 					</main>
 				</div>

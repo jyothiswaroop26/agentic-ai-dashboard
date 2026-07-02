@@ -7,6 +7,7 @@ type SidebarProps = {
 
 const sidebarItems = [
 	{ label: "Dashboard", route: "/dashboard" },
+	{ label: "Research Request", route: "/research" },
 	{ label: "History", route: "/history" },
 	{ label: "Reports", route: "/reports" },
 ];
