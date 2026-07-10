@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AgentStatus from "./components/AgentStatus";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
@@ -40,6 +41,7 @@ const App = () => {
 						<Routes>
 							<Route path="/" element={<Navigate replace to="/dashboard" />} />
 							<Route path="/dashboard" element={<Dashboard />} />
+							<Route path="/agent-status" element={<AgentStatus />} />
 							<Route path="/history" element={<History />} />
 							<Route path="/reports" element={<Reports />} />
 							<Route path="/research" element={<ResearchRequest />} />

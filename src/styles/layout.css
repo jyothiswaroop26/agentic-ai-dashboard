@@ -497,6 +497,263 @@ body {
   padding-left: 1rem;
 }
 
+.status-link {
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #184fbd;
+  border: 1px solid #b9cdf4;
+  background: #edf4ff;
+  border-radius: 999px;
+  padding: 0.28rem 0.62rem;
+}
+
+.status-link:hover {
+  background: #e2edff;
+}
+
+.status-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-panel-header h3 {
+  margin: 0;
+}
+
+.status-panel-header span {
+  color: #5f6f8b;
+  font-size: 0.84rem;
+}
+
+.progress-track {
+  width: 100%;
+  background: #e7eefb;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2e69d2 0%, #7cb3ff 100%);
+  animation: progress-enter 0.55s ease;
+}
+
+@keyframes progress-enter {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+.workflow-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.workflow-steps li {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  background: #f6f9ff;
+  border: 1px solid #dce6fa;
+  border-radius: 12px;
+  padding: 0.62rem 0.72rem;
+}
+
+.workflow-steps li div:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.workflow-steps strong {
+  color: #1f3155;
+}
+
+.workflow-steps li em {
+  font-style: normal;
+  color: #627391;
+  font-size: 0.83rem;
+}
+
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 0.17rem 0.54rem;
+  border: 1px solid transparent;
+}
+
+.is-running {
+  background: #e5f2ff;
+  color: #1659b8;
+  border-color: #bfd9fb;
+}
+
+.is-queued {
+  background: #fff5dd;
+  color: #8f6100;
+  border-color: #f0d491;
+}
+
+.is-blocked {
+  background: #ffeaea;
+  color: #9c2f2f;
+  border-color: #f3b2b2;
+}
+
+.is-completed {
+  background: #e7faef;
+  color: #18673f;
+  border-color: #b8ebcb;
+}
+
+.execution-pills {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-state-bars {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.dashboard-state-row {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.dashboard-state-row div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  color: #5f6f8b;
+  font-size: 0.82rem;
+}
+
+.status-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.status-kpi {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.status-kpi small {
+  color: #627391;
+}
+
+.status-content-grid {
+  align-items: start;
+}
+
+.workflow-panel {
+  min-height: 100%;
+}
+
+.execution-state-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.execution-state-list li {
+  display: grid;
+  gap: 0.34rem;
+}
+
+.execution-state-list li > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.45rem;
+  color: #627391;
+  font-size: 0.84rem;
+}
+
+.agent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.agent-card {
+  border: 1px solid #d9e4f7;
+  background: linear-gradient(180deg, #fbfdff 0%, #f5f9ff 100%);
+  border-radius: 12px;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.agent-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.agent-card-head h4 {
+  margin: 0;
+  color: #1a2d4f;
+}
+
+.agent-card-head p {
+  margin: 0.18rem 0 0;
+  color: #677a99;
+  font-size: 0.83rem;
+}
+
+.agent-card-body {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.agent-card-body > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.45rem;
+  color: #5f6f8b;
+  font-size: 0.83rem;
+}
+
+.agent-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  color: #6f809f;
+}
+
 .panel-stack {
   display: grid;
   gap: 0.9rem;
@@ -771,6 +1028,18 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .status-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-steps li {
+    grid-template-columns: 1fr;
+  }
+
+  .agent-grid {
+    grid-template-columns: 1fr;
+  }
+
   .content-grid {
     grid-template-columns: 1fr;
   }
@@ -830,6 +1099,10 @@ body {
 
   .metrics-grid {
     grid-template-columns: 1fr;
+  }
+
+  .execution-pills {
+    gap: 0.35rem;
   }
 
   .rv-list-items {
