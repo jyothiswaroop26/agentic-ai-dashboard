@@ -11,6 +11,7 @@ const sidebarItems = [
 	{ label: "Research Request", route: "/research" },
 	{ label: "History", route: "/history" },
 	{ label: "Reports", route: "/reports" },
+	{ label: "Reports History", route: "/reports/history" },
 ];
 
 const Sidebar = ({ isOpen, onNavigate }: SidebarProps) => {

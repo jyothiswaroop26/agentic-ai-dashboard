@@ -1,4 +1,5 @@
 import ReportViewer, { type ReportItem } from "../components/ReportViewer";
+import { Link } from "react-router-dom";
 
 const reports: ReportItem[] = [
 	{
@@ -33,12 +34,17 @@ const reports: ReportItem[] = [
 const Reports = () => {
 	return (
 		<section className="page">
-			<header className="page-header">
-				<h2>Reports</h2>
-				<p>
-					Browse generated reports, read markdown output, and download in multiple
-					formats.
-				</p>
+			<header className="page-header reports-page-header">
+				<div>
+					<h2>Reports</h2>
+					<p>
+						Browse generated reports, read markdown output, and download in multiple
+						formats.
+					</p>
+				</div>
+				<Link className="status-link" to="/reports/history">
+					View Reports History
+				</Link>
 			</header>
 
 			<ReportViewer reports={reports} />

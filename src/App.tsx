@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Reports from "./pages/Reports";
+import ReportsHistory from "./pages/ReportsHistory";
 import ResearchRequest from "./pages/ResearchRequest";
 import "./styles/layout.css";
 
@@ -44,6 +45,7 @@ const App = () => {
 							<Route path="/agent-status" element={<AgentStatus />} />
 							<Route path="/history" element={<History />} />
 							<Route path="/reports" element={<Reports />} />
+							<Route path="/reports/history" element={<ReportsHistory />} />
 							<Route path="/research" element={<ResearchRequest />} />
 						</Routes>
 					</main>
