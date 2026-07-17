@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { submitResearchRequest } from "../services/api";
+import { getResearchRequestResponse, submitResearchRequest } from "../services/api";
 
 type ResearchType =
 	| ""
@@ -74,12 +74,24 @@ function validate(fields: FormFields): FormErrors {
 
 type SubmitStatus = "idle" | "loading" | "success" | "error";
 
+type AiResponsePayload = {
+	id: string;
+	title: string;
+	summary?: string;
+	markdown?: string;
+	tags?: string[];
+	author?: string;
+	updatedAt?: string;
+};
+
 const ResearchRequest = () => {
 	const [form, setForm] = useState<FormFields>(INITIAL_FORM);
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [touched, setTouched] = useState<Partial<Record<keyof FormFields, boolean>>>({});
 	const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
 	const [submittedId, setSubmittedId] = useState<string | null>(null);
+	const [submitError, setSubmitError] = useState<string | null>(null);
+	const [aiResponse, setAiResponse] = useState<AiResponsePayload | null>(null);
 
 	const handleChange = (
 		e: React.ChangeEvent<
@@ -129,6 +141,9 @@ const ResearchRequest = () => {
 		if (Object.keys(validationErrors).length > 0) return;
 
 		setSubmitStatus("loading");
+		setSubmitError(null);
+		setAiResponse(null);
+		setSubmittedId(null);
 		try {
 			const result = await submitResearchRequest({
 				...form,
@@ -138,11 +153,30 @@ const ResearchRequest = () => {
 					.filter(Boolean),
 			});
 			setSubmittedId(result.id);
+
+			let nextAiResponse: AiResponsePayload | null =
+				result.aiResponse ?? null;
+
+			if (!nextAiResponse && result.id) {
+				try {
+					nextAiResponse = await getResearchRequestResponse(result.id);
+				} catch {
+					// The request can still be valid even if response generation is delayed.
+					nextAiResponse = null;
+				}
+			}
+
+			setAiResponse(nextAiResponse);
 			setSubmitStatus("success");
 			setForm(INITIAL_FORM);
 			setTouched({});
 			setErrors({});
-		} catch {
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: "Please check your connection and try again.",
+			);
 			setSubmitStatus("error");
 		}
 	};
@@ -153,6 +187,8 @@ const ResearchRequest = () => {
 		setTouched({});
 		setSubmitStatus("idle");
 		setSubmittedId(null);
+		setSubmitError(null);
+		setAiResponse(null);
 	};
 
 	const isLoading = submitStatus === "loading";
@@ -177,6 +213,11 @@ const ResearchRequest = () => {
 								Tracking ID: <code>{submittedId}</code>
 							</p>
 						)}
+						{!aiResponse && (
+							<p className="rr-banner__sub">
+								Your AI response is being generated and will appear in Reports shortly.
+							</p>
+						)}
 					</div>
 					<button
 						className="rr-banner__dismiss"
@@ -194,7 +235,7 @@ const ResearchRequest = () => {
 					<div>
 						<strong>Submission failed.</strong>
 						<p className="rr-banner__sub">
-							Please check your connection and try again.
+							{submitError ?? "Please check your connection and try again."}
 						</p>
 					</div>
 					<button
@@ -205,6 +246,39 @@ const ResearchRequest = () => {
 						Dismiss
 					</button>
 				</div>
+			)}
+
+			{submitStatus === "success" && aiResponse && (
+				<article className="rr-ai-response panel" aria-live="polite">
+					<header className="rr-ai-response__header">
+						<div>
+							<h3>{aiResponse.title}</h3>
+							{aiResponse.summary ? <p>{aiResponse.summary}</p> : null}
+						</div>
+						<div className="rr-ai-response__meta">
+							{aiResponse.author ? <span>Author: {aiResponse.author}</span> : null}
+							{aiResponse.updatedAt ? <span>Updated: {aiResponse.updatedAt}</span> : null}
+						</div>
+					</header>
+
+					{aiResponse.markdown ? (
+						<pre className="rr-ai-response__content">{aiResponse.markdown}</pre>
+					) : (
+						<p className="rr-ai-response__placeholder">
+							AI response received. Open Reports for the formatted version.
+						</p>
+					)}
+
+					{aiResponse.tags?.length ? (
+						<div className="rr-ai-response__tags">
+							{aiResponse.tags.map((tag) => (
+								<span className="rr-ai-response__tag" key={tag}>
+									{tag}
+								</span>
+							))}
+						</div>
+					) : null}
+				</article>
 			)}
 
 			<form
