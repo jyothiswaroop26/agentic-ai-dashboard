@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./ui";
 
 export interface ReportItem {
@@ -13,6 +14,8 @@ export interface ReportItem {
 
 interface ReportViewerProps {
 	reports: ReportItem[];
+	initialReportId?: string;
+	showDetailLinks?: boolean;
 }
 
 interface LinkParts {
@@ -275,10 +278,45 @@ const renderMarkdownBlocks = (markdown: string) => {
 	return blocks;
 };
 
-const ReportViewer = ({ reports }: ReportViewerProps) => {
+const ReportViewer = ({
+	reports,
+	initialReportId,
+	showDetailLinks = true,
+}: ReportViewerProps) => {
 	const [selectedReportId, setSelectedReportId] = useState<string>(
-		reports[0]?.id ?? "",
+		initialReportId && reports.some((report) => report.id === initialReportId)
+			? initialReportId
+			: reports[0]?.id ?? "",
 	);
+	const [copyStatusMessage, setCopyStatusMessage] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!reports.length) {
+			setSelectedReportId("");
+			return;
+		}
+
+		if (initialReportId && reports.some((report) => report.id === initialReportId)) {
+			setSelectedReportId(initialReportId);
+			return;
+		}
+
+		if (!reports.some((report) => report.id === selectedReportId)) {
+			setSelectedReportId(reports[0].id);
+		}
+	}, [initialReportId, reports, selectedReportId]);
+
+	useEffect(() => {
+		if (!copyStatusMessage) {
+			return;
+		}
+
+		const timer = window.setTimeout(() => {
+			setCopyStatusMessage(null);
+		}, 2200);
+
+		return () => window.clearTimeout(timer);
+	}, [copyStatusMessage]);
 
 	const selectedReport = useMemo(
 		() => reports.find((report) => report.id === selectedReportId) ?? reports[0],
@@ -290,7 +328,7 @@ const ReportViewer = ({ reports }: ReportViewerProps) => {
 		[selectedReport],
 	);
 
-	const handleDownload = (format: "markdown" | "text" | "html") => {
+	const handleDownload = (format: "markdown" | "text" | "html" | "json") => {
 		if (!selectedReport) {
 			return;
 		}
@@ -307,6 +345,10 @@ const ReportViewer = ({ reports }: ReportViewerProps) => {
 			content = buildHtmlExport(selectedReport.title, selectedReport.markdown);
 			extension = "html";
 			mimeType = "text/html;charset=utf-8";
+		} else if (format === "json") {
+			content = JSON.stringify(selectedReport, null, 2);
+			extension = "json";
+			mimeType = "application/json;charset=utf-8";
 		}
 
 		const blob = new Blob([content], { type: mimeType });
@@ -319,6 +361,37 @@ const ReportViewer = ({ reports }: ReportViewerProps) => {
 		anchor.click();
 		anchor.remove();
 		URL.revokeObjectURL(url);
+	};
+
+	const copyToClipboard = async (mode: "markdown" | "text") => {
+		if (!selectedReport) {
+			return;
+		}
+
+		const textToCopy =
+			mode === "markdown"
+				? selectedReport.markdown
+				: markdownToPlainText(selectedReport.markdown);
+
+		try {
+			if (navigator?.clipboard?.writeText) {
+				await navigator.clipboard.writeText(textToCopy);
+			} else {
+				const textArea = document.createElement("textarea");
+				textArea.value = textToCopy;
+				document.body.append(textArea);
+				textArea.focus();
+				textArea.select();
+				document.execCommand("copy");
+				textArea.remove();
+			}
+
+			setCopyStatusMessage(
+				mode === "markdown" ? "Markdown copied." : "Plain text copied.",
+			);
+		} catch {
+			setCopyStatusMessage("Unable to copy right now.");
+		}
 	};
 
 	if (!reports.length) {
@@ -338,19 +411,29 @@ const ReportViewer = ({ reports }: ReportViewerProps) => {
 						const isSelected = report.id === selectedReport?.id;
 
 						return (
-							<button
-								aria-pressed={isSelected}
-								className={`rv-list-item ${
-									isSelected ? "rv-list-item-active" : ""
-								}`}
-								onClick={() => setSelectedReportId(report.id)}
-								key={report.id}
-								type="button"
-							>
-								<span className="rv-list-title">{report.title}</span>
-								<span className="rv-list-summary">{report.summary}</span>
-								<span className="rv-list-date">Updated {report.updatedAt}</span>
-							</button>
+							<div key={report.id} className="rv-list-item-wrap">
+								<button
+									aria-pressed={isSelected}
+									className={`rv-list-item ${
+										isSelected ? "rv-list-item-active" : ""
+									}`}
+									onClick={() => setSelectedReportId(report.id)}
+									type="button"
+								>
+									<span className="rv-list-title">{report.title}</span>
+									<span className="rv-list-summary">{report.summary}</span>
+									<span className="rv-list-date">Updated {report.updatedAt}</span>
+								</button>
+
+								{showDetailLinks ? (
+									<Link
+										className="rv-item-details-link"
+										to={`/reports/${encodeURIComponent(report.id)}`}
+									>
+										Open Details
+									</Link>
+								) : null}
+							</div>
 						);
 					})}
 				</div>
@@ -378,16 +461,52 @@ const ReportViewer = ({ reports }: ReportViewerProps) => {
 						) : null}
 					</div>
 
-					<div className="rv-actions" aria-label="Download options">
-						<Button onClick={() => handleDownload("markdown")} size="sm" variant="secondary">
-							Download MD
-						</Button>
-						<Button onClick={() => handleDownload("text")} size="sm" variant="secondary">
-							Download TXT
-						</Button>
-						<Button onClick={() => handleDownload("html")} size="sm" variant="primary">
-							Download HTML
-						</Button>
+					<div className="rv-actions" aria-label="Report actions">
+						<div className="rv-action-group">
+							<span className="rv-action-label">Export</span>
+							<div className="rv-action-buttons">
+								<Button
+									onClick={() => handleDownload("markdown")}
+									size="sm"
+									variant="secondary"
+								>
+									MD
+								</Button>
+								<Button onClick={() => handleDownload("text")} size="sm" variant="secondary">
+									TXT
+								</Button>
+								<Button onClick={() => handleDownload("html")} size="sm" variant="secondary">
+									HTML
+								</Button>
+								<Button onClick={() => handleDownload("json")} size="sm" variant="secondary">
+									JSON
+								</Button>
+							</div>
+						</div>
+
+						<div className="rv-action-group">
+							<span className="rv-action-label">Copy</span>
+							<div className="rv-action-buttons">
+								<Button
+									onClick={() => void copyToClipboard("markdown")}
+									size="sm"
+									variant="primary"
+								>
+									Copy Markdown
+								</Button>
+								<Button
+									onClick={() => void copyToClipboard("text")}
+									size="sm"
+									variant="secondary"
+								>
+									Copy Text
+								</Button>
+							</div>
+						</div>
+
+						<p aria-live="polite" className="rv-copy-status">
+							{copyStatusMessage ?? "\u00a0"}
+						</p>
 					</div>
 				</header>
 

@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import ReportViewer, { type ReportItem } from "./ReportViewer";
 
 const reports: ReportItem[] = [
@@ -22,8 +23,37 @@ const reports: ReportItem[] = [
 ];
 
 describe("ReportViewer", () => {
+	const createObjectUrlSpy = vi
+		.spyOn(URL, "createObjectURL")
+		.mockImplementation(() => "blob:report");
+	const revokeObjectUrlSpy = vi
+		.spyOn(URL, "revokeObjectURL")
+		.mockImplementation(() => undefined);
+	const clickSpy = vi
+		.spyOn(HTMLAnchorElement.prototype, "click")
+		.mockImplementation(() => undefined);
+
+	beforeEach(() => {
+		Object.defineProperty(navigator, "clipboard", {
+			configurable: true,
+			value: {
+				writeText: vi.fn().mockResolvedValue(undefined),
+			},
+		});
+	});
+
+	afterEach(() => {
+		createObjectUrlSpy.mockClear();
+		revokeObjectUrlSpy.mockClear();
+		clickSpy.mockClear();
+	});
+
 	it("renders markdown from the selected report", () => {
-		render(<ReportViewer reports={reports} />);
+		render(
+			<MemoryRouter>
+				<ReportViewer reports={reports} />
+			</MemoryRouter>,
+		);
 
 		expect(screen.getByText("Overview")).not.toBeNull();
 		expect(screen.getByText("Metric one")).not.toBeNull();
@@ -31,7 +61,11 @@ describe("ReportViewer", () => {
 	});
 
 	it("switches reports from the report list", () => {
-		render(<ReportViewer reports={reports} />);
+		render(
+			<MemoryRouter>
+				<ReportViewer reports={reports} />
+			</MemoryRouter>,
+		);
 
 		fireEvent.click(screen.getByRole("button", { name: /beta report/i }));
 
@@ -40,10 +74,44 @@ describe("ReportViewer", () => {
 	});
 
 	it("shows empty-state message when no reports exist", () => {
-		render(<ReportViewer reports={[]} />);
+		render(
+			<MemoryRouter>
+				<ReportViewer reports={[]} />
+			</MemoryRouter>,
+		);
 
 		expect(
 			screen.getByText("No reports available yet. Generate a report to get started."),
 		).not.toBeNull();
+	});
+
+	it("exports the selected report as JSON", () => {
+		render(
+			<MemoryRouter>
+				<ReportViewer reports={reports} />
+			</MemoryRouter>,
+		);
+
+		fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+
+		expect(createObjectUrlSpy).toHaveBeenCalledTimes(1);
+		expect(clickSpy).toHaveBeenCalledTimes(1);
+		expect(revokeObjectUrlSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it("copies markdown content to clipboard", async () => {
+		render(
+			<MemoryRouter>
+				<ReportViewer reports={reports} />
+			</MemoryRouter>,
+		);
+
+		fireEvent.click(screen.getByRole("button", { name: "Copy Markdown" }));
+
+		await waitFor(() => {
+			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+				reports[0].markdown,
+			);
+		});
 	});
 });

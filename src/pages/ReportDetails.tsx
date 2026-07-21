@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import ReportViewer, { type ReportItem } from "../components/ReportViewer";
 import { getReports } from "../services/api";
-import { Link } from "react-router-dom";
 import { normalizeReport } from "../services/reportUtils";
 
-const Reports = () => {
+const ReportDetails = () => {
+	const { reportId = "" } = useParams();
 	const [reports, setReports] = useState<ReportItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -25,7 +26,7 @@ const Reports = () => {
 			setErrorMessage(
 				error instanceof Error
 					? error.message
-					: "Unable to load reports right now.",
+					: "Unable to load report details right now.",
 			);
 		} finally {
 			setIsLoading(false);
@@ -36,42 +37,52 @@ const Reports = () => {
 		void loadReports();
 	}, [loadReports]);
 
+	const matchedReport = useMemo(
+		() => reports.find((report) => report.id === reportId),
+		[reports, reportId],
+	);
+
 	return (
 		<section className="page">
-			<header className="page-header reports-page-header">
+			<header className="page-header reports-page-header report-details-header">
 				<div>
-					<h2>Reports</h2>
+					<h2>Report Details</h2>
 					<p>
-						Browse generated reports, open report details, and export output in multiple
-						formats.
+						Review full report content, copy sections, and export in your preferred
+						format.
 					</p>
 				</div>
-				<Link className="status-link" to="/reports/history">
-					View Reports History
+				<Link className="status-link" to="/reports">
+					Back to Reports
 				</Link>
 			</header>
 
 			{isLoading ? (
 				<section className="panel reports-feedback" aria-live="polite">
 					<span className="ui-btn-spinner" aria-hidden="true" />
-					<p>Loading AI reports...</p>
+					<p>Loading report details...</p>
 				</section>
 			) : errorMessage ? (
 				<section className="panel reports-feedback reports-feedback-error" role="alert">
-					<p>Failed to load reports: {errorMessage}</p>
-					<button
-						className="rr-btn rr-btn--ghost"
-						onClick={() => void loadReports()}
-						type="button"
-					>
-						Try Again
-					</button>
+					<p>Failed to load report details: {errorMessage}</p>
+				</section>
+			) : reports.length === 0 ? (
+				<section className="panel reports-feedback" aria-live="polite">
+					<p>No reports available yet.</p>
+				</section>
+			) : !matchedReport ? (
+				<section className="panel reports-feedback reports-feedback-error" role="alert">
+					<p>Report not found for ID: {reportId}</p>
 				</section>
 			) : (
-				<ReportViewer reports={reports} />
+				<ReportViewer
+					reports={reports}
+					initialReportId={matchedReport.id}
+					showDetailLinks={false}
+				/>
 			)}
 		</section>
 	);
 };
 
-export default Reports;
+export default ReportDetails;
